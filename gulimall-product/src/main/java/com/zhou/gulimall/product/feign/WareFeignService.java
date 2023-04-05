@@ -6,6 +6,7 @@ import com.zhou.gulimall.product.vo.SkuHasStockVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
@@ -13,5 +14,5 @@ import java.util.List;
 public interface WareFeignService {
 
     @PostMapping("/ware/waresku/hasstock")
-    R<List<SkuHasStockVo>>getSkuHasStock(@RequestBody List<Long> skuIds);
+    R getSkuHasStock(@RequestBody List<Long> skuIds);
 }

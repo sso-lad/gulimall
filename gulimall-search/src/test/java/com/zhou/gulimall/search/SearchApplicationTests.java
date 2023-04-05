@@ -2,7 +2,7 @@ package com.zhou.gulimall.search;
 
 import com.alibaba.fastjson.JSON;
 import com.zhou.gulimall.search.config.GulimallElasticSearchConfig;
-import io.swagger.models.auth.In;
+
 import lombok.Data;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;

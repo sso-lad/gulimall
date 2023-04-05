@@ -1,11 +1,14 @@
 package com.zhou.gulimall.product.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
+import com.zhou.common.constant.ProductConstant;
 import com.zhou.common.to.SkuReductionTo;
 import com.zhou.common.to.SpuBoundTo;
 import com.zhou.common.to.es.SkuEsModel;
 import com.zhou.common.utils.R;
 import com.zhou.gulimall.product.entity.*;
 import com.zhou.gulimall.product.feign.CouponFeignService;
+import com.zhou.gulimall.product.feign.SearchFeignService;
 import com.zhou.gulimall.product.feign.WareFeignService;
 import com.zhou.gulimall.product.service.*;
 import com.zhou.gulimall.product.vo.*;
@@ -59,6 +62,9 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
     @Autowired
     private WareFeignService wareFeignService;
+
+    @Autowired
+    private SearchFeignService searchFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -206,7 +212,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         return new PageUtils(page);
     }
-
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void up(Long spuId) {
 
@@ -231,8 +237,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         //TODO 发送远程调用,库存系统查询是否有库存
         Map<Long, Boolean> stockMap = null;
         try{
-            R<List<SkuHasStockVo>> skuHasStock = wareFeignService.getSkuHasStock(skuIdList);
-            stockMap = skuHasStock.getData().stream().collect(Collectors.toMap(SkuHasStockVo::getSkuId, SkuHasStockVo::getHasStock));
+            R r = wareFeignService.getSkuHasStock(skuIdList);
+            stockMap = r.getData(new TypeReference<List<SkuHasStockVo>>(){}).stream().collect(Collectors.toMap(SkuHasStockVo::getSkuId, SkuHasStockVo::getHasStock));
         }catch (Exception e){
             log.error("库存服务查询失败:{}",e);
         }
@@ -265,7 +271,15 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         }).collect(Collectors.toList());
 
         //TODo 5.将数据发送给es进行保存 gulimall-search;
-
+        R r = searchFeignService.productStatusUp(uoProducts);
+        if(r.getCode() == 0){
+            //远程调用成功
+            //TODO 修改当前spu的状态
+            this.baseMapper.updateSpuStatus(spuId, ProductConstant.StatusEnum.SPU_UP.getCode());
+        } else {
+            //失败
+            //TODO 重复调用 接口幂等性;重试机制
+        }
     }
 
 

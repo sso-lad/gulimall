@@ -10,11 +10,9 @@ spring:
         server-addr: 127.0.0.1:8848
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
-#    alicloud:
-#      access-key: LTAI5tQQJkcPjKxhiW4LcFAm
-#      secret-key: cZwV6sZMdaX8qQtRItkTAtjdDeidFu
-#      oss:
-#        endpoint: oss-cn-shenzhen.aliyuncs.com
+ribbon:
+  ReadTimeout: 60000
+  ConnectTimeout: 60000
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
   global-config:

@@ -3,7 +3,6 @@ package com.zhou.gulimall.product.feign;
 import com.zhou.common.to.SkuReductionTo;
 import com.zhou.common.to.SpuBoundTo;
 import com.zhou.common.utils.R;
-import oracle.jdbc.proxy.annotation.Post;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
