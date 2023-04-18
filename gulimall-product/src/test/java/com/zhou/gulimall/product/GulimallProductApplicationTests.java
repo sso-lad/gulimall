@@ -12,16 +12,23 @@ import com.aliyun.oss.model.PutObjectResult;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.UUID;
+
 @SpringBootTest
 class GulimallProductApplicationTests {
 
+    @Autowired
+    private StringRedisTemplate  redisTemplate;
+
     @Test
-     public void  testUpLoad(){
+    public void  testUpLoad(){
 
         // 填写Bucket名称，例如examplebucket。
         String bucketName = "gulimall-zhouhr";
@@ -69,5 +76,13 @@ class GulimallProductApplicationTests {
         }
      }
 
-
+     @Test
+    public void testRedis(){
+         ValueOperations<String, String> ops = redisTemplate.opsForValue();
+         //保存
+         ops.set("hello", "world_"+ UUID.randomUUID().toString());
+         //查询
+         String hello = ops.get("hello");
+         System.out.println("之前保存的数据是:"+hello);
+     }
 }
