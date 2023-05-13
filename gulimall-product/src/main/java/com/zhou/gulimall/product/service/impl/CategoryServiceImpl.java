@@ -5,15 +5,15 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.zhou.gulimall.product.service.CategoryBrandRelationService;
 import com.zhou.gulimall.product.vo.Catelog2Vo;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -36,6 +36,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     private StringRedisTemplate redisTemplate;
+    @Autowired
+    private RedissonClient redissonClient;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<CategoryEntity> page = this.page(
@@ -150,6 +152,28 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         }
     }
 
+    /**
+     * 缓存里面的数据如何和数据库保持一致
+     * 1.双写模式
+     * 2.失效模式
+     * @return
+     */
+    public Map<String, List<Catelog2Vo>> getCataogJsonFromDBWithRedissionLock(){
+        //1.锁的名字。锁的粒度，越细越快。
+        //锁的粒度：具体缓存的是某个数据，11-号商品；
+        RLock lock = redissonClient.getLock("catalogJson-lock");
+        //默认看门狗机制,自动续锁
+        lock.lock();
+        System.out.println("获取锁成功");
+        //加锁成功、执行业务
+        Map<String, List<Catelog2Vo>> dataFromDb;
+        try {
+            dataFromDb = getDataFromDb();
+        } finally {
+            lock.unlock();
+        }
+        return dataFromDb;
+    }
     public Map<String, List<Catelog2Vo>> getCataogJsonFromDBWithRedisLock(){
         //1.占分布式锁.
         //原子操作
@@ -239,7 +263,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         if(StringUtils.isEmpty(catalogJSON)){
             System.out.println("缓存不命中....查询数据库...");
             //2.缓存中没有
-            Map<String, List<Catelog2Vo>> cataogJsonFromDB = getCataogJsonFromDBWithRedisLock();
+            Map<String, List<Catelog2Vo>> cataogJsonFromDB = getCataogJsonFromDBWithRedissionLock();
+            System.out.println("释放锁");
             return cataogJsonFromDB;
         }
         System.out.println("缓存命中....直接返回...");

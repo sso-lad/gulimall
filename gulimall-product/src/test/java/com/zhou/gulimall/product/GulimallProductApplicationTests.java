@@ -10,6 +10,7 @@ import com.aliyun.oss.model.PutObjectResult;
 
 
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -26,6 +27,9 @@ class GulimallProductApplicationTests {
 
     @Autowired
     private StringRedisTemplate  redisTemplate;
+
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Test
     public void  testUpLoad(){
@@ -84,5 +88,10 @@ class GulimallProductApplicationTests {
          //查询
          String hello = ops.get("hello");
          System.out.println("之前保存的数据是:"+hello);
+     }
+
+     @Test
+    public void testRedisson(){
+         System.out.println(redissonClient);
      }
 }
