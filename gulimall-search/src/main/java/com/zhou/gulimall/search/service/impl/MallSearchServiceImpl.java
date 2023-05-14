@@ -57,7 +57,7 @@ public class MallSearchServiceImpl  implements MallSearchService {
             e.printStackTrace();
         }
 
-        return null;
+        return result;
     }
 
     /**
@@ -186,7 +186,10 @@ public class MallSearchServiceImpl  implements MallSearchService {
 
         }
         //按照库存
-        boolQuery.filter(QueryBuilders.termQuery("hasStock", param.getHasStock() == 1));
+        if (param.getHasStock() !=null ){
+            boolQuery.filter(QueryBuilders.termQuery("hasStock", param.getHasStock() == 1));
+        }
+
         //按照价格区间
         if (StringUtils.isNotEmpty(param.getSkuPrice())){
             RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery("skuPrice");
@@ -237,7 +240,7 @@ public class MallSearchServiceImpl  implements MallSearchService {
         sourceBuilder.aggregation(brand_agg);
         //2.分类聚合
         TermsAggregationBuilder catalog_agg = AggregationBuilders.terms("catalog_agg").field("catalogId").size(20);
-        catalog_agg.subAggregation(AggregationBuilders.terms("catalog_name_agg").field("catalogName").size(1));
+        catalog_agg.subAggregation(AggregationBuilders.terms("catalog_name_agg").field("catalogName.keyword").size(1));
         sourceBuilder.aggregation(catalog_agg);
         //3.属性聚合
         NestedAggregationBuilder attr_agg = AggregationBuilders.nested("attr_agg", "attrs");

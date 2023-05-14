@@ -13,7 +13,7 @@ public class SearchParam {
     private String keyword;//页面传递过来的全文匹配关键字
     private String catalog3Id;//三级分类id
     private String sort;
-    private Integer hasStock = 1;
+    private Integer hasStock;
     private String skuPrice;
     private List<Long> brandId;//品牌
     private List<String> attrs;//属性
