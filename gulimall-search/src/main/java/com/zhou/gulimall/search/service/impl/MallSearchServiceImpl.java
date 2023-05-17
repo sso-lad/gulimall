@@ -144,6 +144,11 @@ public class MallSearchServiceImpl  implements MallSearchService {
         int totalPages = (int)total%EsConstant.PRODUCT_PAGESIZE == 0 ?
                 (int)total/EsConstant.PRODUCT_PAGESIZE:((int)total/EsConstant.PRODUCT_PAGESIZE+1);
         result.setTotalPages(totalPages);
+        List<Integer> pageNavs = new LinkedList<>();
+        for(int i=1;i<=totalPages;i++){
+            pageNavs.add(i);
+        }
+        result.setPageNavs(pageNavs);
         return result;
     }
 
@@ -168,7 +173,7 @@ public class MallSearchServiceImpl  implements MallSearchService {
         }
         //1.2 filter - 按照品牌
         if(param.getBrandId() != null && param.getBrandId().size()>0){
-            boolQuery.filter(QueryBuilders.termQuery("brandId", param.getBrandId()));
+            boolQuery.filter(QueryBuilders.termQuery("brandId.keyword", param.getBrandId()));
         }
         //按照属性
         if (param.getAttrs() != null && param.getAttrs().size()>0){
