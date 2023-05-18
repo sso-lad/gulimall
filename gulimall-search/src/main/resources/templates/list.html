@@ -1022,7 +1022,7 @@
                 <div class="filter">
                     <!--综合排序-->
                     <div class="filter_top">
-                        <div class="filter_top_left" th:with="p = ${param.sort}">
+                        <div class="filter_top_left" th:with="p = ${param.sort},priceRange=${param.skuPrice}">
                             <a  th:class="${(!#strings.isEmpty(p)&& #strings.startsWith(p,'hotScore') && #strings.endsWith(p,'desc'))?'sort_a desc':'sort_a'}"
                                th:attr="style=${(#strings.isEmpty(p)
                             || #strings.startsWith(p,'hotScore'))?
@@ -1039,6 +1039,8 @@
                                 价格 [[${(!#strings.isEmpty(p)&& #strings.startsWith(p,'skuPrice') && #strings.endsWith(p,'desc'))?'↓':'↑'}]]</a>
                             <a href="/static/search/#">评论分</a>
                             <a href="/static/search/#">上架时间</a>
+                            <input id="skuPriceFrom" type="number" style="width: 100px;margin-left: 30px;" th:value="${#strings.isEmpty(priceRange)?'':#strings.substringBefore(priceRange,'_')}"> -
+                            <input id="skuPriceTo" type="number" style="width: 100px;" th:value="${#strings.isEmpty(priceRange)?'':#strings.substringAfter(priceRange,'_')}"> <button id="skuPriceSearchBtn">确定</button>
                         </div>
                         <div class="filter_top_right">
                             <span class="fp-text">
@@ -1146,8 +1148,8 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/static/search/#">
-                                        <i></i>
+                                    <a href="#" th:with="check=${param.hasStock}">
+                                        <input id="showHasStock" type="checkbox" th:checked="${#strings.equals(check,'1')}">
                                         仅显示有货
                                     </a>
                                 </li>
@@ -1971,11 +1973,7 @@
         $(this).css("color","#727272")
     })
     function searchProducts(name,value) {
-        if(location.href.indexOf("?")!=-1){
-            location.href = location.href +"&"+name+"="+value;
-        } else{
-            location.href = location.href + "?"+name+"="+value;
-        }
+        location.href = replaceAndAddParamVal(location.href,"keyword",value);
     }
     function searchByKeyWord(){
         searchProducts("keyword",$("#keyword_input").val());
@@ -2045,6 +2043,21 @@
             $(ele).text(text+"↑");
         }
     }
+    $("#skuPriceSearchBtn").click(function(){
+        var from  = $("#skuPriceFrom").val();
+        var to = $("#skuPriceTo").val();
+        var query = from +"_"+to;
+        location.href = replaceAndAddParamVal(location.href,"skuPrice",query);
+    })
+    $("#showHasStock").click(function () {
+        if ($(this).prop('checked')){
+            location.href = replaceAndAddParamVal(location.href,"hasStock",1);
+        } else {
+            var re = eval('/(hasStock=)([^&]*)/gi');
+            location.href = (location.href+"").replace(re,'');
+        }
+        return false;
+    })
 </script>
 </body>
 </html>
