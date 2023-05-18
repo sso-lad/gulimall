@@ -1,10 +1,14 @@
 package com.zhou.gulimall.search.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.zhou.common.to.es.SkuEsModel;
+import com.zhou.common.utils.R;
 import com.zhou.gulimall.search.config.GulimallElasticSearchConfig;
 import com.zhou.gulimall.search.constant.EsConstant;
+import com.zhou.gulimall.search.feign.ProductFeignService;
 import com.zhou.gulimall.search.service.MallSearchService;
+import com.zhou.gulimall.search.vo.AttrResponseVo;
 import com.zhou.gulimall.search.vo.SearchParam;
 import com.zhou.gulimall.search.vo.SearchResult;
 import org.apache.commons.lang.StringUtils;
@@ -34,6 +38,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,6 +50,8 @@ public class MallSearchServiceImpl  implements MallSearchService {
 
     @Autowired
     private RestHighLevelClient client;
+    @Autowired
+    private ProductFeignService productFeignService;
     @Override
     public SearchResult search(SearchParam param) {
         SearchResult result = null;
@@ -149,6 +157,44 @@ public class MallSearchServiceImpl  implements MallSearchService {
             pageNavs.add(i);
         }
         result.setPageNavs(pageNavs);
+        if(param.getAttrs() != null && param.getAttrs().size()>0){
+            //构建面包屑导航功能
+            List<SearchResult.NavVo> navVos = param.getAttrs().stream().map(attr -> {
+                //分析
+                SearchResult.NavVo navVo = new SearchResult.NavVo();
+                String[] s = attr.split("_");
+                navVo.setNavValue(s[1]);
+                R r = productFeignService.attrInfo(Long.parseLong(s[0]));
+                if (r.getCode() == 0) {
+                    AttrResponseVo data = r.getData("attr", new TypeReference<AttrResponseVo>() {
+                    });
+                    navVo.setNavName(data.getAttrName());
+
+                } else {
+                    navVo.setNavName(s[0]);
+                }
+                String encode = null;
+
+                try {
+                    encode = URLEncoder.encode(attr, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                if(param.get_queryString().indexOf("&")!=-1){
+                    String replace = param.get_queryString().replace("&attrs=" + encode, "");
+                    if (!"".equals(replace)) navVo.setLink("http://search.gulimall.com/list.html?"+replace);
+                    else navVo.setLink("http://search.gulimall.com/list.html"+replace);
+                } else {
+                    String replace = param.get_queryString().replace("attrs=" + encode, "");
+                    if (!"".equals(replace)) navVo.setLink("http://search.gulimall.com/list.html?"+replace);
+                    else navVo.setLink("http://search.gulimall.com/list.html"+replace);
+                }
+
+                return navVo;
+            }).collect(Collectors.toList());
+            result.setNavs(navVos);
+        }
+
         return result;
     }
 

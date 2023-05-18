@@ -762,6 +762,11 @@
                 <a href="/static/search/#">游戏手机</a>
             </div>
         </div>
+        <!--            面包屑-->
+        <div class="JD_ipone_one c">
+            <a th:href="${nav.link}" th:each="nav:${result.navs}"><span th:text="${nav.navName}"></span>
+                :<span th:text="${nav.navValue}"></span>×</a>
+        </div>
         <i><img src="/static/search/image/right-@1x.png" alt=""></i>
     </div>
 </div>
@@ -842,7 +847,7 @@
                     <div class="sl_value">
                         <ul>
                             <li th:each="val:${attr.attrValue}"><a href="/static/search/#" th:text="${val}"
-                            th:href="${'javascript:searchProducts(&quot;attrs&quot;,&quot;'+attr.attrId+'_'+val+'&quot;)'}">5.56英寸及以上</a></li>
+                            th:href="${'javascript:searchAttr(&quot;attrs&quot;,&quot;'+attr.attrId+'_'+val+'&quot;)'}">5.56英寸及以上</a></li>
                         </ul>
                     </div>
                 </div>
@@ -1973,7 +1978,7 @@
         $(this).css("color","#727272")
     })
     function searchProducts(name,value) {
-        location.href = replaceAndAddParamVal(location.href,"keyword",value);
+        location.href = replaceAndAddParamVal(location.href,name,value,false);
     }
     function searchByKeyWord(){
         searchProducts("keyword",$("#keyword_input").val());
@@ -1999,15 +2004,28 @@
 
         return false;
     })
-    function  replaceAndAddParamVal(url,paramName,replaceVal) {
+    function searchAttr(name,value) {
+        location.href = replaceAndAddParamVal(location.href,name,value,true);
+    }
+    function  replaceAndAddParamVal(url,paramName,replaceVal,forceAdd) {
         //1.如果没有就添加,
         var oUrl = url.toString();
         if(oUrl.indexOf(paramName) != -1){
-            var re = eval('/(' + paramName+'=)([^&]*)/gi');
-            var nUrl = oUrl.replace(re,paramName+'='+replaceVal);
-            return nUrl;
-        } else {
+            if(forceAdd){
                 var nUrl=''
+                if(location.href.indexOf("?")!=-1){
+                    nUrl = oUrl +"&"+paramName+"="+replaceVal;
+                } else{
+                    nUrl = oUrl +"?"+paramName+"="+replaceVal;
+                }
+                return nUrl;
+            } else {
+                var re = eval('/(' + paramName+'=)([^&]*)/gi');
+                var nUrl = oUrl.replace(re,paramName+'='+replaceVal);
+                return nUrl;
+            }
+        } else {
+            var nUrl=''
             if(location.href.indexOf("?")!=-1){
                 nUrl = oUrl +"&"+paramName+"="+replaceVal;
             } else{

@@ -18,4 +18,5 @@ public class SearchParam {
     private List<Long> brandId;//品牌
     private List<String> attrs;//属性
     private Integer pageNum = 1;
+    private String _queryString;
 }
