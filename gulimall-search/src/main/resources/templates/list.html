@@ -780,9 +780,9 @@
                 <h3><b>手机</b><em>商品筛选</em></h3>
                 <div class="st-ext">共&nbsp;<span>10135</span>个商品 </div>
             </div>
-            <div class="JD_nav_logo">
+            <div class="JD_nav_logo" th:with="brandId=${param.brandId}">
                 <!--品牌-->
-                <div class="JD_nav_wrap">
+                <div  th:if="${#strings.isEmpty(brandId)}" class="JD_nav_wrap">
                     <div class="sl_key">
                         <span><b>品牌：</b></span>
                     </div>
@@ -840,7 +840,7 @@
                     </div>
                 </div>
                 <!--屏幕尺寸-->
-                <div class="JD_pre" th:each="attr:${result.attrs}">
+                <div class="JD_pre" th:each="attr:${result.attrs}" th:if="${!#lists.contains(result.attrIds,attr.attrId) }">
                     <div class="sl_key">
                         <span th:text="${attr.attrName}">屏幕尺寸：</span>
                     </div>
@@ -2005,9 +2005,11 @@
         return false;
     })
     function searchAttr(name,value) {
-        location.href = replaceAndAddParamVal(location.href,name,value,true);
+
+       location.href = replaceAndAddParamVal(location.href,name,value,true);
     }
     function  replaceAndAddParamVal(url,paramName,replaceVal,forceAdd) {
+
         //1.如果没有就添加,
         var oUrl = url.toString();
         if(oUrl.indexOf(paramName) != -1){

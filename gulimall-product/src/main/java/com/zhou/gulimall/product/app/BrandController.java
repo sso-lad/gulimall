@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
@@ -87,6 +88,11 @@ public class BrandController {
 		brandService.removeByIds(Arrays.asList(brandIds));
 
         return R.ok();
+    }
+    @RequestMapping("/brandsInfo")
+    public R brandsInfo( @RequestParam("brandIds") List<Long> brandIds){
+        List<BrandEntity> brand = brandService.getBrandIdsByIds(brandIds);
+        return R.ok().put("brand", brand);
     }
 
 }
