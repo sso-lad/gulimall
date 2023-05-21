@@ -1270,10 +1270,23 @@
 	<script src="/static/item/js/js.js" type="text/javascript" charset="utf-8"></script>
 	<script type="text/javascript">
 		$(".sku_attr_value").click(function () {
-			//1.先获取当前skus组合
-			//2.获取另外选择的属性的组合
+			//1.点击的元素添加上自定义的属性.为了识别我们是刚才被点击的
+			var skus = new Array();
+			$(this).addClass("clicked");
+			var cur = $(this).attr("skus").split(",");
+			skus.push(cur);
+			//去掉同一行的所有的checked
+			$(this).parent().parent().find(".sku_attr_value").removeClass("checked");
+			$("a[class='sku_attr_value checked']").each(function () {
+				skus.push($(this).attr("skus").split(","));
+			})
 			//3.取出他们的交际
+			var filterElement = skus[0];
+			for(var i = 1;i<skus.length;i++) {
+				filterElement = $(filterElement).filter(skus[i]);
+			}
 			//4.跳转
+			location.href = "http://item.gulimall.com/"+filterElement[0]+".html";
 		})
 		$(function () {
 			$(".sku_attr_value").parent().css({"border":"solid 1px #CCC"});
