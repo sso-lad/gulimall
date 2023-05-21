@@ -10,6 +10,8 @@ import com.aliyun.oss.model.PutObjectResult;
 
 
 import com.zhou.gulimall.product.dao.AttrGroupDao;
+import com.zhou.gulimall.product.dao.SkuSaleAttrValueDao;
+import com.zhou.gulimall.product.vo.SkuItemSaleAttrVo;
 import com.zhou.gulimall.product.vo.SpuItemAttrGroupVo;
 import org.junit.jupiter.api.Test;
 import org.redisson.api.RedissonClient;
@@ -36,6 +38,8 @@ class GulimallProductApplicationTests {
 
     @Autowired
     private AttrGroupDao attrGroupDao;
+    @Autowired
+    private SkuSaleAttrValueDao skuSaleAttrValueDao;
 
     @Test
     public void  testUpLoad(){
@@ -97,8 +101,10 @@ class GulimallProductApplicationTests {
      }
     @Test
     public  void testAttr(){
-        List<SpuItemAttrGroupVo> attrGroupWithAttrsBySpuId = attrGroupDao.getAttrGroupWithAttrsBySpuId(100L, 225L);
-        System.out.println(attrGroupWithAttrsBySpuId);
+//        List<SpuItemAttrGroupVo> attrGroupWithAttrsBySpuId = attrGroupDao.getAttrGroupWithAttrsBySpuId(100L, 225L);
+//        System.out.println(attrGroupWithAttrsBySpuId);
+        List<SkuItemSaleAttrVo> saleAttrsBySpuId = skuSaleAttrValueDao.getSaleAttrsBySpuId(14L);
+        System.out.println(saleAttrsBySpuId);
     }
      @Test
     public void testRedisson(){
