@@ -9,6 +9,8 @@ import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
 
 
+import com.zhou.gulimall.product.dao.AttrGroupDao;
+import com.zhou.gulimall.product.vo.SpuItemAttrGroupVo;
 import org.junit.jupiter.api.Test;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.UUID;
 
 @SpringBootTest
@@ -30,6 +33,9 @@ class GulimallProductApplicationTests {
 
     @Autowired
     private RedissonClient redissonClient;
+
+    @Autowired
+    private AttrGroupDao attrGroupDao;
 
     @Test
     public void  testUpLoad(){
@@ -89,7 +95,11 @@ class GulimallProductApplicationTests {
          String hello = ops.get("hello");
          System.out.println("之前保存的数据是:"+hello);
      }
-
+    @Test
+    public  void testAttr(){
+        List<SpuItemAttrGroupVo> attrGroupWithAttrsBySpuId = attrGroupDao.getAttrGroupWithAttrsBySpuId(100L, 225L);
+        System.out.println(attrGroupWithAttrsBySpuId);
+    }
      @Test
     public void testRedisson(){
          System.out.println(redissonClient);
