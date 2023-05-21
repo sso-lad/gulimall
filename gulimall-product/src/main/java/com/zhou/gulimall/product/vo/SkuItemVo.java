@@ -12,6 +12,8 @@ public class SkuItemVo {
 
     SkuInfoEntity info;
 
+    boolean hasStock = true;
+
     List<SkuImagesEntity> images;
 
     List<SkuItemSaleAttrVo> saleAttr;
