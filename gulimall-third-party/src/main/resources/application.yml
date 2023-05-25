@@ -3,6 +3,13 @@ spring:
     nacos:
       discovery:
         server-addr:  123123
+    alicloud:
+      sms:
+        host:
+        path:
+        smsSignId:
+        templateId:
+        appcode:
   application:
     name: gulimall-third-party
 server:
